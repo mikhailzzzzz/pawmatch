@@ -1,0 +1,61 @@
+<!-- Верхняя навигация -->
+<ng-container *ngIf="showNav">
+  <header class="app-header">
+    <div class="header-inner">
+      <a routerLink="/swipe" class="logo">
+        <span class="logo-paw">🐾</span>
+        <span class="logo-text">PawMatch</span>
+      </a>
+
+      <nav class="header-nav">
+        <a routerLink="/swipe" routerLinkActive="active">{{ 'nav.swipe' | translate }}</a>
+        <a routerLink="/matches" routerLinkActive="active">{{ 'nav.matches' | translate }}</a>
+        <a routerLink="/pets" routerLinkActive="active">{{ 'nav.pets' | translate }}</a>
+        <a routerLink="/shelters" routerLinkActive="active">{{ 'nav.shelters' | translate }}</a>
+        <a routerLink="/about" routerLinkActive="active">{{ 'nav.about' | translate }}</a>
+        <a routerLink="/help" routerLinkActive="active">{{ 'nav.help' | translate }}</a>
+        <a routerLink="/profile" routerLinkActive="active">{{ 'nav.profile' | translate }}</a>
+        
+        <div class="lang-dropdown">
+          <select [value]="currentLang" (change)="changeLanguage($any($event.target).value)">
+            <option value="ru">{{ 'language.ru' | translate }}</option>
+            <option value="en">{{ 'language.en' | translate }}</option>
+          </select>
+        </div>
+        
+        <button type="button" class="theme-toggle" (click)="toggleTheme()">
+          {{ isDarkTheme ? '☀️ ' + ('theme.light' | translate) : '🌙 ' + ('theme.dark' | translate) }}
+        </button>
+      </nav>
+    </div>
+  </header>
+</ng-container>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<main [class.with-header]="showNav">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<ng-container *ngIf="showNav">
+  <nav class="bottom-nav">
+    <a routerLink="/swipe" routerLinkActive="active" class="nav-item">
+      🐾 <span>{{ 'nav.swipe' | translate }}</span>
+    </a>
+
+    <a routerLink="/matches" routerLinkActive="active" class="nav-item">
+      💕 <span>{{ 'nav.matches' | translate }}</span>
+    </a>
+
+    <a routerLink="/pets" routerLinkActive="active" class="nav-item">
+      🏠 <span>{{ 'nav.pets' | translate }}</span>
+    </a>
+
+    <a routerLink="/profile" routerLinkActive="active" class="nav-item">
+      👤 <span>{{ 'nav.profile' | translate }}</span>
+    </a>
+  </nav>
+</ng-container>
+
+<!-- FOOTER ВСЕГДА ВНИЗУ -->
+<app-footer></app-footer>

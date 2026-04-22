@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  margin-top: auto;
+}
+
+.site-footer {
+  margin-top: auto;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), var(--surface));
+  border-top: 1px solid var(--border);
+  box-shadow: var(--footer-shadow);
+  color: var(--text);
+}
+
+.footer-inner,
+.footer-meta {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 28px;
+  padding-bottom: 20px;
+}
+
+.footer-brand {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-logo-icon {
+  font-size: 22px;
+}
+
+.footer-logo-text {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--pink-deep);
+}
+
+.footer-copy,
+.footer-meta p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.footer-copy {
+  max-width: 520px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 700;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.footer-link:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+  background: var(--nav-link-hover-bg);
+  color: var(--pink-deep);
+  border-color: transparent;
+}
+
+.footer-meta {
+  padding-top: 16px;
+  padding-bottom: 20px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 24px;
+    padding-bottom: 18px;
+  }
+
+  .footer-links {
+    width: 100%;
+  }
+
+  .footer-link {
+    flex: 1 1 140px;
+  }
+}
+
+:host-context([data-theme='dark']) .site-footer {
+  background: linear-gradient(180deg, var(--surface) 90%, var(--surface));
+}
+
+:host-context([data-theme='dark']) .footer-link:hover {
+  color: var(--accent);
+}

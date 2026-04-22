@@ -1,0 +1,83 @@
+<div class="matches-page">
+  <div class="page-header">
+    <h1>{{ 'matches.title' | translate }}</h1>
+    <p class="subtitle">{{ 'matches.subtitle' | translate }}</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loader-wrap">
+    <div class="paw-spin">🐾</div>
+    <p>{{ 'matches.loading' | translate }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && matches.length === 0" class="empty-state">
+    <span class="empty-icon">💔</span>
+    <h3>{{ 'matches.emptyTitle' | translate }}</h3>
+    <p>{{ 'matches.emptyMessage' | translate }}</p>
+    <a routerLink="/swipe" class="btn-go">{{ 'buttons.goToSwipe' | translate }} 🐾</a>
+  </div>
+
+  <div *ngIf="!isLoading && matches.length > 0" class="matches-grid">
+    <div *ngFor="let match of matches; trackBy: trackByMatchId">
+        <div class="match-card"> <!-- Оставляем одну карточку -->
+          <div class="match-photo-wrap">
+            <img
+              [src]="match.animal.photo || 'assets/placeholder-paw.png'"
+              [alt]="match.animal.name"
+              onerror="this.src='https://placekitten.com/300/300'"
+            />
+            <div class="heart-badge">💕</div>
+            <div class="species-badge">{{ getSpeciesEmoji(match.animal.species) }}</div>
+          </div>
+
+          <div class="match-body">
+            <div class="match-name-row">
+              <h3>{{ match.animal.name }}</h3>
+              <span class="match-age">{{ match.animal.age }} {{ 'matches.age' | translate }}</span>
+            </div>
+
+            <p class="match-breed">{{ match.animal.breed }}</p>
+
+            <div *ngIf="match.animal.shelter_detail || match.animal.shelterDetail" class="shelter-note">
+              <span>🏠 {{ (match.animal.shelter_detail || match.animal.shelterDetail)?.name }}</span>
+              <small>{{ (match.animal.shelter_detail || match.animal.shelterDetail)?.address }}</small>
+            </div>
+
+            <div class="match-tags">
+              <span *ngIf="match.animal.is_vaccinated || match.animal.isVaccinated" class="tag tag-green">{{ 'matches.vaccinated' | translate }} 💉</span>
+              <span *ngIf="match.animal.is_neutered || match.animal.isNeutered" class="tag tag-purple">{{ 'matches.neutered' | translate }} ✂️</span>
+            </div>
+
+            <p class="match-date">{{ getTimeAgo(match.created_at || match.createdAt) }}</p>
+
+            <button class="btn-contact" (click)="onContact(match)">
+              {{ 'buttons.contactShelter' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div *ngIf="selectedMatch" class="contact-modal-overlay" (click)="closeContactModal()">
+    <div class="contact-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" (click)="closeContactModal()">×</button>
+      <p class="modal-eyebrow">{{ 'modal.shelterContacts' | translate }}</p>
+      <h2 class="modal-title">{{ selectedMatch.animal.name }}</h2>
+      <p class="modal-subtitle">
+        {{ 'modal.animal' | translate }}
+        <strong>{{ selectedMatch.animal.name }}</strong>
+      </p>
+      <p class="modal-message">
+        {{ 'modal.callMessage' | translate }}
+      </p>
+      <a
+        class="modal-phone"
+        [href]="'tel:' + getPrimaryPhone(selectedMatch)"
+      >
+        {{ getPrimaryPhone(selectedMatch) }}
+      </a>
+      <p class="modal-address">
+        {{ 'modal.address' | translate }} {{ (selectedMatch.animal.shelter_detail || selectedMatch.animal.shelterDetail)?.address || ('matches.noPhone' | translate) }}
+      </p>
+    </div>
+  </div>
+</div>

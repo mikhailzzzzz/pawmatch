@@ -1,0 +1,68 @@
+<div class="shelters-container">
+  <div class="list">
+    <div *ngFor="let s of shelters" class="card">
+      <h3>{{ s.name }}</h3>
+      <p>{{ s.address }}</p>
+
+      <div class="card-footer">
+        <div class="links">
+          <a *ngIf="s.instagram" [href]="s.instagram" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a *ngIf="s.telegram" [href]="s.telegram" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </div>
+        <button type="button" class="call-button" (click)="openCallModal(s)">☎ {{ 'shelters.call' | translate }}</button>
+        <button type="button" class="map-button" (click)="showOnMap(s)">🗺️ {{ 'shelters.showOnMap' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<div
+  *ngIf="selectedShelter"
+  class="call-modal-overlay"
+  (click)="closeCallModal()"
+  role="presentation"
+>
+  <div
+    class="call-modal"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'call-modal-title-' + selectedShelter.id"
+    (click)="$event.stopPropagation()"
+  >
+    <button
+      type="button"
+      class="modal-close"
+      (click)="closeCallModal()"
+      aria-label="Закрыть окно звонка"
+    >
+      ×
+    </button>
+
+    <p class="modal-eyebrow">{{ 'modal.shelterContacts' | translate }}</p>
+    <h3 class="modal-title" [id]="'call-modal-title-' + selectedShelter.id">
+      {{ selectedShelter.name }}
+    </h3>
+    <div class="modal-phones">
+      <a
+        *ngFor="let phone of getShelterPhones(selectedShelter)"
+        class="modal-phone"
+        [href]="'tel:' + phone"
+      >
+        {{ phone }}
+      </a>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="secondary-button" (click)="closeCallModal()">{{ 'modal.close' | translate }}</button>
+      <a
+        *ngIf="getShelterPhones(selectedShelter).length"
+        class="primary-call-link"
+        [href]="'tel:' + getShelterPhones(selectedShelter)[0]"
+      >
+        {{ 'shelters.call' | translate }}
+      </a>
+    </div>
+  </div>
+</div>

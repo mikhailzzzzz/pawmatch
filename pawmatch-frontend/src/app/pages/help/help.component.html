@@ -1,0 +1,36 @@
+<section class="help-page">
+  <div class="help-hero">
+    <span class="help-badge">{{ 'help.badge' | translate }}</span>
+    <h1>{{ 'help.title' | translate }}</h1>
+    <p>{{ 'help.heroText' | translate }}</p>
+  </div>
+
+  <div class="help-chat card-surface">
+    <div class="chat-messages">
+      <article *ngFor="let message of messages" class="message" [class.message-user]="message.role === 'user'" [class.message-assistant]="message.role === 'assistant'">
+        <div class="message-label">{{ message.role === 'user' ? ('help.you' | translate) : ('help.assistant' | translate) }}</div>
+        <div class="message-text">{{ message.text }}</div>
+      </article>
+
+      <article *ngIf="isLoading" class="message message-assistant message-loading">
+        <div class="message-label">{{ 'help.assistant' | translate }}</div>
+        <div class="message-text">{{ 'help.thinking' | translate }}</div>
+      </article>
+    </div>
+
+    <div *ngIf="errorMessage" class="chat-error">{{ errorMessage }}</div>
+
+    <div class="suggestions-section">
+      <div class="suggestions-header">
+        <h3>{{ 'help.askQuestion' | translate }}</h3>
+        <p>{{ 'help.selectQuestion' | translate }}</p>
+      </div>
+      <div class="suggestions-grid">
+        <button *ngFor="let suggestion of suggestions" type="button" class="suggestion-button" (click)="useSuggestion(suggestion)" [disabled]="isLoading">
+          <span class="suggestion-icon">❓</span>
+          <span class="suggestion-text">{{ suggestion }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

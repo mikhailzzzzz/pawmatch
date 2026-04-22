@@ -1,0 +1,82 @@
+<div class="admin-page">
+  <h1>Админ панель</h1>
+
+  <div *ngIf="message" class="message">{{ message }}</div>
+
+  <div class="admin-section">
+    <h2>Добавить питомца пользователю</h2>
+    <form (ngSubmit)="createPet()">
+      <select [(ngModel)]="petForm.user_id" name="user_id" required>
+        <option value="">Выберите пользователя</option>
+        <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
+      </select>
+      <select [(ngModel)]="petForm.animal_id" name="animal_id" required>
+        <option value="">Выберите животное</option>
+        <option *ngFor="let animal of animals" [value]="animal.id">{{ animal.name }}</option>
+      </select>
+      <input [(ngModel)]="petForm.name" name="name" placeholder="Имя питомца" required>
+      <input [(ngModel)]="petForm.birth_date" name="birth_date" type="date" required>
+      <input [(ngModel)]="petForm.weight" name="weight" type="number" placeholder="Вес" required>
+      <button type="submit">Добавить питомца</button>
+    </form>
+  </div>
+
+  <div class="admin-section">
+    <h2>Создать матч</h2>
+    <form (ngSubmit)="createMatch()">
+      <select [(ngModel)]="matchForm.user_id" name="user_id" required>
+        <option value="">Выберите пользователя</option>
+        <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
+      </select>
+      <select [(ngModel)]="matchForm.animal_id" name="animal_id" required>
+        <option value="">Выберите животное</option>
+        <option *ngFor="let animal of animals" [value]="animal.id">{{ animal.name }}</option>
+      </select>
+      <button type="submit">Создать матч</button>
+    </form>
+  </div>
+
+  <div class="admin-section">
+    <h2>Питомцы ({{ pets.length }})</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Пользователь</th>
+          <th>Животное</th>
+          <th>Имя</th>
+          <th>Вес</th>
+          <th>Дата рождения</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pet of pets">
+          <td>{{ pet.user_username }}</td>
+          <td>{{ pet.animal_name }}</td>
+          <td>{{ pet.name }}</td>
+          <td>{{ pet.weight }} кг</td>
+          <td>{{ pet.birth_date }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-section">
+    <h2>Матчи ({{ matches.length }})</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Пользователь</th>
+          <th>Животное</th>
+          <th>Дата</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let match of matches">
+          <td>{{ match.user.username }}</td>
+          <td>{{ match.animal.name }}</td>
+          <td>{{ match.created_at }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

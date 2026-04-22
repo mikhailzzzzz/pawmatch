@@ -1,0 +1,86 @@
+<div class="swipe-page">
+
+  <!-- Match notification toast -->
+  <div *ngIf="matchNotification" class="match-toast">
+    💕 {{ 'swipe.matched' | translate }} {{ currentAnimal?.name }}!
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2>🐾 {{ 'swipe.title' | translate }}</h2>
+    <p class="subtitle">{{ 'swipe.subtitle' | translate }}</p>
+    <div *ngIf="animals.length > 0" class="progress-bar-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressWidth"></div>
+      </div>
+      <p class="counter">{{ currentIndex + 1 }} / {{ animals.length }}</p>
+    </div>
+  </div>
+  
+  <div class="species-filter">
+  <button [class.active]="selectedSpecies === 'all'" (click)="onFilterChange('all')">🐾 Все</button>
+  <button [class.active]="selectedSpecies === 'dog'" (click)="onFilterChange('dog')">🐶 Собаки</button>
+  <button [class.active]="selectedSpecies === 'cat'" (click)="onFilterChange('cat')">🐱 Кошки</button>
+  </div>
+
+  <!-- Загрузка -->
+  <div *ngIf="isLoading" class="loader-wrap">
+    <div class="paw-spinner">🐾</div>
+    <p>{{ 'pets.loading' | translate }}</p>
+  </div>
+
+  <!-- Карточки закончились -->
+  <div *ngIf="!isLoading && animals.length === 0" class="empty-state">
+    <span class="empty-icon">😿</span>
+    <h3>{{ 'swipe.noMore' | translate }}</h3>
+    <button class="btn-reload" (click)="loadCards()">{{ 'buttons.reload' | translate }} 🔄</button>
+  </div>
+
+  <!-- Карточка животного -->
+  <div
+    *ngIf="!isLoading && currentAnimal"
+    class="card-container"
+    [class.swipe-left]="swipeDirection === 'left'"
+    [class.swipe-right]="swipeDirection === 'right'"
+  >
+      <div class="animal-card">
+        <!-- Фото -->
+        <div class="card-photo-wrap">
+          <img
+            [src]="currentAnimal.photo || 'assets/placeholder-paw.png'"
+            [alt]="currentAnimal.name"
+            class="card-photo"
+            onerror="this.src='https://placekitten.com/400/400'"
+          />
+          <div class="species-badge">{{ getSpeciesEmoji(currentAnimal.species) }}</div>
+          <div class="likes-badge">❤️ {{ currentAnimal.likesCount }}</div>
+        </div>
+
+        <!-- Информация -->
+        <div class="card-body">
+          <div class="card-name-row">
+            <h2 class="card-name">{{ currentAnimal.name }}</h2>
+            <span class="card-age">{{ currentAnimal.age }} {{ 'pets.age' | translate }}</span>
+          </div>
+          <p class="card-breed">{{ currentAnimal.breed }}</p>
+
+          <div class="card-tags">
+            <span *ngIf="currentAnimal.isVaccinated" class="tag tag-green">💉 {{ 'pets.vaccinated' | translate }}</span>
+            <span *ngIf="currentAnimal.isNeutered" class="tag tag-purple">✂️ {{ 'pets.neutered' | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопки свайпа -->
+      <div class="swipe-actions">
+        <button class="btn-dislike" (click)="onDislike()" [disabled]="!!swipeDirection">
+          <span>👎</span>
+          <small>{{ 'buttons.dislike' | translate }}</small>
+        </button>
+        <button class="btn-like" (click)="onLike()" [disabled]="!!swipeDirection">
+          <span>❤️</span>
+          <small>{{ 'buttons.like' | translate }}</small>
+        </button>
+      </div>
+    </div>
+</div>

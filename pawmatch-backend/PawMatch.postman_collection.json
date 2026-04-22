@@ -1,0 +1,542 @@
+{
+  "info": {
+    "_postman_id": "pawmatch-api-collection",
+    "name": "PawMatch API",
+    "description": "Full collection for the PawMatch Django REST API. Base URL: http://localhost:8000/api. Set the {{access_token}} variable after login.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/register/", "host": ["{{base_url}}"], "path": ["register", ""] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login (obtain token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('access_token', json.access);",
+                  "pm.collectionVariables.set('refresh_token', json.refresh);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/token/", "host": ["{{base_url}}"], "path": ["token", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/token/refresh/", "host": ["{{base_url}}"], "path": ["token", "refresh", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{base_url}}/logout/", "host": ["{{base_url}}"], "path": ["logout", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"detail\": \"Successfully logged out.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get current user (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/me/", "host": ["{{base_url}}"], "path": ["me", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"is_staff\": false\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shelters",
+      "item": [
+        {
+          "name": "List shelters",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/shelters/", "host": ["{{base_url}}"], "path": ["shelters", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Приют Солнышко\",\n    \"address\": \"ул. Ленина, 10\",\n    \"phone\": \"+7 999 000 00 00\",\n    \"latitude\": 55.75,\n    \"longitude\": 37.61,\n    \"telegram\": \"@shelter_sun\",\n    \"instagram\": \"shelter_sun\",\n    \"website\": \"https://shelter.ru\",\n    \"animal_count\": 5\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Swipe",
+      "item": [
+        {
+          "name": "Get swipe cards",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/swipe-cards/", "host": ["{{base_url}}"], "path": ["swipe-cards", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 3,\n    \"name\": \"Барсик\",\n    \"species\": \"cat\",\n    \"breed\": \"Мейн-кун\",\n    \"age\": 2,\n    \"photo\": null,\n    \"is_vaccinated\": true,\n    \"is_neutered\": false,\n    \"is_adopted\": false,\n    \"likes_count\": 0,\n    \"shelter\": 1,\n    \"shelter_detail\": { \"id\": 1, \"name\": \"Приют Солнышко\" }\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Swipe (like)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animal_id\": 3,\n  \"is_like\": true\n}"
+            },
+            "url": { "raw": "{{base_url}}/swipe/", "host": ["{{base_url}}"], "path": ["swipe", ""] }
+          },
+          "response": [
+            {
+              "name": "200 Matched",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"matched\",\n  \"match\": {\n    \"id\": 5,\n    \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n    \"user\": { \"id\": 1, \"username\": \"testuser\" },\n    \"created_at\": \"2025-04-22T12:00:00Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Swipe (dislike)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animal_id\": 3,\n  \"is_like\": false\n}"
+            },
+            "url": { "raw": "{{base_url}}/swipe/", "host": ["{{base_url}}"], "path": ["swipe", ""] }
+          },
+          "response": [
+            {
+              "name": "200 Swiped",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"swiped\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "List my matches",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/matches/", "host": ["{{base_url}}"], "path": ["matches", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 5,\n    \"animal\": {\n      \"id\": 3,\n      \"name\": \"Барсик\",\n      \"species\": \"cat\"\n    },\n    \"user\": { \"id\": 1, \"username\": \"testuser\" },\n    \"created_at\": \"2025-04-22T12:00:00Z\"\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Animals",
+      "item": [
+        {
+          "name": "Submit animal",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shelter\": 1,\n  \"name\": \"Шарик\",\n  \"species\": \"dog\",\n  \"breed\": \"Лабрадор\",\n  \"age\": 3,\n  \"photo_url\": \"https://example.com/sharik.jpg\",\n  \"is_vaccinated\": true,\n  \"is_neutered\": false\n}"
+            },
+            "url": { "raw": "{{base_url}}/animals/submit/", "host": ["{{base_url}}"], "path": ["animals", "submit", ""] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 10,\n  \"name\": \"Шарик\",\n  \"species\": \"dog\",\n  \"breed\": \"Лабрадор\",\n  \"age\": 3,\n  \"is_vaccinated\": true,\n  \"is_neutered\": false,\n  \"is_adopted\": false,\n  \"photo\": null,\n  \"likes_count\": 0\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pets (CRUD)",
+      "item": [
+        {
+          "name": "List my pets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/pets/", "host": ["{{base_url}}"], "path": ["pets", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 2,\n    \"name\": \"Мурка\",\n    \"birth_date\": \"2022-01-15\",\n    \"weight\": 4.2,\n    \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n    \"user\": { \"id\": 1, \"username\": \"testuser\" }\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animal_id\": 3,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.2\n}"
+            },
+            "url": { "raw": "{{base_url}}/pets/", "host": ["{{base_url}}"], "path": ["pets", ""] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.2,\n  \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n  \"user\": { \"id\": 1, \"username\": \"testuser\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get pet by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/pets/2/", "host": ["{{base_url}}"], "path": ["pets", "2", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.2,\n  \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n  \"user\": { \"id\": 1, \"username\": \"testuser\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update pet (partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 4.8\n}"
+            },
+            "url": { "raw": "{{base_url}}/pets/2/", "host": ["{{base_url}}"], "path": ["pets", "2", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.8,\n  \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n  \"user\": { \"id\": 1, \"username\": \"testuser\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete pet",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/pets/2/", "host": ["{{base_url}}"], "path": ["pets", "2", ""] }
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assistant",
+      "item": [
+        {
+          "name": "Ask assistant",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"How does matching work?\",\n  \"lang\": \"en\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/assistant/", "host": ["{{base_url}}"], "path": ["assistant", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"reply\": \"A match is created automatically with every like.\",\n  \"suggestions\": [\n    \"How does matching work?\",\n    \"How to contact a shelter?\",\n    \"What can I do in the profile?\"\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User Profile & Stats",
+      "item": [
+        {
+          "name": "Get user profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/user/profile/", "host": ["{{base_url}}"], "path": ["user", "profile", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"user_id\": 1,\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"is_staff\": false,\n  \"total_pets\": 1,\n  \"total_matches\": 3\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get swipe stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/user/swipe-stats/", "host": ["{{base_url}}"], "path": ["user", "swipe-stats", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"user_id\": 1,\n  \"total_swipes\": 10,\n  \"likes_count\": 7,\n  \"dislikes_count\": 3,\n  \"match_rate\": 70.0,\n  \"last_swiped\": \"2025-04-22T11:45:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin (staff only)",
+      "item": [
+        {
+          "name": "List all users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/admin/users/", "host": ["{{base_url}}"], "path": ["admin", "users", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  { \"id\": 1, \"username\": \"admin\", \"email\": \"admin@example.com\", \"is_staff\": true },\n  { \"id\": 2, \"username\": \"testuser\", \"email\": \"test@example.com\", \"is_staff\": false }\n]"
+            }
+          ]
+        },
+        {
+          "name": "List all animals",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/admin/animals/", "host": ["{{base_url}}"], "path": ["admin", "animals", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 3,\n    \"name\": \"Барсик\",\n    \"species\": \"cat\",\n    \"breed\": \"Мейн-кун\",\n    \"age\": 2,\n    \"is_adopted\": false\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "List all pets (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/admin/pets/", "host": ["{{base_url}}"], "path": ["admin", "pets", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 2,\n    \"name\": \"Мурка\",\n    \"user\": { \"id\": 1, \"username\": \"testuser\" },\n    \"animal\": { \"id\": 3, \"name\": \"Барсик\" }\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create pet (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 2,\n  \"animal_id\": 3,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.2\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/pets/", "host": ["{{base_url}}"], "path": ["admin", "pets", ""] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Мурка\",\n  \"birth_date\": \"2022-01-15\",\n  \"weight\": 4.2,\n  \"user\": { \"id\": 2, \"username\": \"testuser\" },\n  \"animal\": { \"id\": 3, \"name\": \"Барсик\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List all matches (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/admin/matches/", "host": ["{{base_url}}"], "path": ["admin", "matches", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 5,\n    \"user\": { \"id\": 1, \"username\": \"testuser\" },\n    \"animal\": { \"id\": 3, \"name\": \"Барсик\" },\n    \"created_at\": \"2025-04-22T12:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create match (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 2,\n  \"animal_id\": 5\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/matches/", "host": ["{{base_url}}"], "path": ["admin", "matches", ""] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 6,\n  \"user\": { \"id\": 2, \"username\": \"testuser\" },\n  \"animal\": { \"id\": 5, \"name\": \"Шарик\" },\n  \"created_at\": \"2025-04-22T13:00:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

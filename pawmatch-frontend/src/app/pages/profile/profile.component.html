@@ -1,0 +1,334 @@
+<div class="profile-page">
+  @if (loading) {
+    <div class="status-message status-loading">
+      {{ 'common.loading' | translate }}
+    </div>
+  }
+
+  @if (!loading && error) {
+    <div class="status-message status-error">
+      {{ error }}
+    </div>
+  }
+
+  @if (!loading && user) {
+    <section class="profile-card">
+      <div class="profile-card__header">
+        <div>
+          <p class="profile-card__eyebrow">{{ 'profile.personalCabinet' | translate }}</p>
+          <h1>{{ user.username }}</h1>
+          <p class="profile-card__email">{{ user.email }}</p>
+        </div>
+
+        <span class="profile-role" [class.profile-role--admin]="user.is_staff">
+          {{ user.is_staff ? ('profile.administrator' | translate) : ('profile.user' | translate) }}
+        </span>
+      </div>
+
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <span class="profile-stat__label">{{ 'profile.id' | translate }}</span>
+          <strong>#{{ user.id }}</strong>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat__label">{{ 'profile.login' | translate }}</span>
+          <strong>{{ user.username }}</strong>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat__label">{{ 'profile.email' | translate }}</span>
+          <strong>{{ user.email }}</strong>
+        </div>
+      </div>
+
+      @if (swipeStats) {
+        <div class="activity-section">
+          <p class="activity-section__label">{{ 'profile.activityStats' | translate }}</p>
+          <div class="activity-grid">
+            <div class="activity-card activity-card--swipes">
+              <span class="activity-card__icon">🐾</span>
+              <strong>{{ swipeStats.total_swipes }}</strong>
+              <span class="activity-card__label">{{ 'profile.totalSwipes' | translate }}</span>
+            </div>
+            <div class="activity-card activity-card--likes">
+              <span class="activity-card__icon">❤️</span>
+              <strong>{{ swipeStats.likes_count }}</strong>
+              <span class="activity-card__label">{{ 'profile.likes' | translate }}</span>
+            </div>
+            <div class="activity-card activity-card--dislikes">
+              <span class="activity-card__icon">👎</span>
+              <strong>{{ swipeStats.dislikes_count }}</strong>
+              <span class="activity-card__label">{{ 'profile.dislikes' | translate }}</span>
+            </div>
+            <div class="activity-card activity-card--rate">
+              <span class="activity-card__icon">🎯</span>
+              <strong>{{ swipeStats.match_rate | number:'1.0-1' }}%</strong>
+              <span class="activity-card__label">{{ 'profile.matchRate' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="quick-links">
+        <a routerLink="/matches" class="quick-link">{{ 'profile.myMatches' | translate }}</a>
+        <a routerLink="/pets" class="quick-link">{{ 'profile.myPets' | translate }}</a>
+        <a routerLink="/swipe" class="quick-link">{{ 'profile.findPets' | translate }}</a>
+        <a routerLink="/shelters" class="quick-link">{{ 'profile.shelters' | translate }}</a>
+        
+      </div>
+
+      <button type="button" class="logout-button" (click)="logout()">
+        {{ 'profile.logout' | translate }}
+      </button>
+    </section>
+
+    @if (user.is_staff) {
+      <section class="admin-section">
+        <div class="admin-section__header">
+          <div>
+            <p class="profile-card__eyebrow">Admin</p>
+            <h2>Панель администратора</h2>
+            <p class="admin-section__description">
+              Добавляйте питомцев пользователям, просматривайте текущие записи и создавайте матчинги вручную.
+            </p>
+          </div>
+        </div>
+
+        @if (adminLoading) {
+          <div class="status-message status-loading">
+            Загружаем админ-данные...
+          </div>
+        }
+
+        @if (adminError) {
+          <div class="status-message status-error">
+            {{ adminError }}
+          </div>
+        }
+
+        @if (!adminLoading) {
+          <div class="admin-grid">
+            <article class="admin-card">
+              <h3>Добавить питомца</h3>
+              <p class="admin-card__hint">
+                Свяжите пользователя с выбранным животным и сохраните карточку питомца.
+              </p>
+
+              <form class="admin-form" (ngSubmit)="createPet()">
+                <label class="form-field">
+                  <span>Пользователь</span>
+                  <select name="petUserId" [(ngModel)]="petForm.user_id" required>
+                    <option [ngValue]="null" disabled>Выберите пользователя</option>
+                    @for (adminUser of adminUsers; track adminUser.id) {
+                      <option [ngValue]="adminUser.id">
+                        {{ getUserLabel(adminUser) }}
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <label class="form-field">
+                  <span>Животное</span>
+                  <select name="petAnimalId" [(ngModel)]="petForm.animal_id" required>
+                    <option [ngValue]="null" disabled>Выберите животное</option>
+                    @for (animal of adminAnimals; track animal.id) {
+                      <option [ngValue]="animal.id">
+                        {{ getAnimalLabel(animal) }}
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <label class="form-field">
+                  <span>Имя питомца</span>
+                  <input
+                    type="text"
+                    name="petName"
+                    [(ngModel)]="petForm.name"
+                    placeholder="Например, Барни"
+                    required
+                  />
+                </label>
+
+                <div class="form-row">
+                  <label class="form-field">
+                    <span>Дата рождения</span>
+                    <input type="date" name="petBirthDate" [(ngModel)]="petForm.birth_date" required />
+                  </label>
+
+                  <label class="form-field">
+                    <span>Вес, кг</span>
+                    <input
+                      type="number"
+                      name="petWeight"
+                      [(ngModel)]="petForm.weight"
+                      min="0.1"
+                      step="0.1"
+                      placeholder="5.4"
+                      required
+                    />
+                  </label>
+                </div>
+
+                @if (petSuccess) {
+                  <div class="inline-message inline-message--success">
+                    {{ petSuccess }}
+                  </div>
+                }
+                @if (petError) {
+                  <div class="inline-message inline-message--error">
+                    {{ petError }}
+                  </div>
+                }
+
+                <button type="submit" class="admin-button" [disabled]="creatingPet || !adminUsers.length || !adminAnimals.length">
+                  {{ creatingPet ? 'Сохраняем...' : 'Создать питомца' }}
+                </button>
+              </form>
+            </article>
+
+            <article class="admin-card">
+              <h3>Добавить животное</h3>
+              <p class="admin-card__hint">
+                Добавьте новое животное из приюта в систему подбора.
+              </p>
+
+              <form class="admin-form" (ngSubmit)="createAnimal()">
+                <label class="form-field">
+                  <span>Приют</span>
+                  <select name="animalShelterId" [(ngModel)]="animalForm.shelter" required>
+                    <option [ngValue]="null" disabled>Выберите приют</option>
+                    @for (shelter of adminShelters; track shelter.id) {
+                      <option [ngValue]="shelter.id">
+                        {{ shelter.name }}
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <label class="form-field">
+                  <span>Имя</span>
+                  <input type="text" name="animalName" [(ngModel)]="animalForm.name" placeholder="Имя животного" required />
+                </label>
+
+                <label class="form-field">
+                  <span>Вид</span>
+                  <select name="animalSpecies" [(ngModel)]="animalForm.species" required>
+                    <option value="dog">Собака</option>
+                    <option value="cat">Кошка</option>
+                    <option value="other">Другое</option>
+                  </select>
+                </label>
+
+                <label class="form-field">
+                  <span>Порода</span>
+                  <input type="text" name="animalBreed" [(ngModel)]="animalForm.breed" placeholder="Порода" required />
+                </label>
+
+                <label class="form-field">
+                  <span>Возраст (лет)</span>
+                  <input type="number" name="animalAge" [(ngModel)]="animalForm.age" min="0" max="30" required />
+                </label>
+
+                <label class="form-field">
+                  <span>Фото (URL)</span>
+                  <input type="url" name="animalPhotoUrl" [(ngModel)]="animalForm.photo_url" placeholder="https://..." />
+                </label>
+
+                <div class="form-field form-field--checkboxes">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="animalVaccinated" [(ngModel)]="animalForm.is_vaccinated" />
+                    Вакцинировано
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="animalNeutered" [(ngModel)]="animalForm.is_neutered" />
+                    Стерилизовано
+                  </label>
+                </div>
+
+                @if (animalSuccess) {
+                  <div class="inline-message inline-message--success">
+                    {{ animalSuccess }}
+                  </div>
+                }
+                @if (animalError) {
+                  <div class="inline-message inline-message--error">
+                    {{ animalError }}
+                  </div>
+                }
+
+                <button type="submit" class="admin-button" [disabled]="creatingAnimal || !adminShelters.length">
+                  {{ creatingAnimal ? 'Добавляем...' : 'Добавить животное' }}
+                </button>
+              </form>
+            </article>
+          </div>
+
+          <div class="admin-lists">
+            <article class="admin-card admin-card--list">
+              <div class="admin-card__title-row">
+                <h3>Питомцы в системе</h3>
+                <span class="counter">{{ adminPets.length }}</span>
+              </div>
+
+              @if (!adminPets.length) {
+                <div class="empty-state">
+                  Пока нет питомцев, созданных через админ-панель.
+                </div>
+              }
+
+              @if (adminPets.length) {
+                <ul class="entity-list">
+                  @for (pet of adminPets; track pet.id) {
+                    <li class="entity-list__item">
+                      <div>
+                        <strong>{{ pet.name }}</strong>
+                        <p>{{ getPetUserLabel(pet) }}</p>
+                        <p>{{ getPetAnimalLabel(pet) }}</p>
+                      </div>
+                      <div class="entity-list__meta">
+                        <span>{{ pet.birth_date | date: 'dd.MM.yyyy' }}</span>
+                        <span>{{ pet.weight }} кг</span>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            </article>
+
+            <article class="admin-card admin-card--list">
+              <div class="admin-card__title-row">
+                <h3>Животные в системе</h3>
+                <span class="counter">{{ adminAnimals.length }}</span>
+              </div>
+
+              @if (!adminAnimals.length) {
+                <div class="empty-state">
+                  Пока нет животных в системе.
+                </div>
+              }
+
+              @if (adminAnimals.length) {
+                <ul class="entity-list">
+                  @for (animal of adminAnimals; track animal.id) {
+                    <li class="entity-list__item">
+                      <div>
+                        <strong>{{ animal.name }}</strong>
+                        <p>{{ getAnimalLabel(animal) }}</p>
+                      </div>
+                      <div class="entity-list__meta">
+                        <span>{{ animal.age }} лет</span>
+                        @if (animal.is_adopted) {
+                          <span class="badge badge--adopted">Усыновлён</span>
+                        }
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            </article>
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

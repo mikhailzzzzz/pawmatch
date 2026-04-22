@@ -1,0 +1,65 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="paw">🐾</span>
+      <h1>PawMatch</h1>
+      <p class="tagline">{{ 'auth.registerSubtitle' | translate }}</p>
+    </div>
+    <form (ngSubmit)="onSubmit()">
+      <!-- form control 1 -->
+      <div class="form-group">
+        <label for="username">{{ 'auth.username' | translate }}</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🐱</span>
+          <input id="username" type="text" [(ngModel)]="username"
+                 name="username" placeholder="username" required />
+        </div>
+      </div>
+
+      <!-- form control 2 -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-wrapper">
+          <span class="input-icon">📧</span>
+          <input id="email" type="email" [(ngModel)]="email"
+                 name="email" placeholder="kitty@example.com" required />
+        </div>
+      </div>
+
+      <!-- form control 3 -->
+      <div class="form-group">
+        <label for="password">{{ 'auth.password' | translate }}</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔑</span>
+          <input id="password" type="password" [(ngModel)]="password"
+                 name="password" placeholder="минимум 6 символов" required />
+        </div>
+      </div>
+
+      <!-- form control 4 -->
+      <div class="form-group">
+        <label for="confirmPassword">{{ 'auth.passwordConfirm' | translate }}</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword"
+                 name="confirmPassword" placeholder="повторите пароль" required />
+        </div>
+      </div>
+
+      <div *ngIf="errorMsg" class="error-banner">{{ errorMsg }}</div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <ng-container *ngIf="isLoading; else notLoading">
+          <span class="spinner"></span> {{ 'auth.submitRegister' | translate }}...
+        </ng-container>
+      </button>
+      <ng-template #notLoading>
+        {{ 'auth.submitRegister' | translate }} 🐾
+      </ng-template>
+    </form>
+
+    <p class="auth-link">
+      {{ 'auth.hasAccount' | translate }} <a routerLink="/login">{{ 'auth.submitLogin' | translate }}</a>
+    </p>
+  </div>
+</div>
