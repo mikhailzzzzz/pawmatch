@@ -2,9 +2,9 @@
 
   <!-- Match notification toast -->
   <div *ngIf="matchNotification" class="match-toast">
-    💕 {{ 'swipe.matched' | translate }} {{ currentAnimal?.name }}!
+    {{ matchNotification }}
   </div>
-
+  
   <!-- Header -->
   <div class="page-header">
     <h2>🐾 {{ 'swipe.title' | translate }}</h2>
