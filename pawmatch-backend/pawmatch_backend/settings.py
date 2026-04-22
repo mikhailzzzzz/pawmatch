@@ -97,4 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:4200',
     'https://pawmatch-pi.vercel.app',
 ]
-CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://pawmatch-backend-scgs.onrender.com',
+]
